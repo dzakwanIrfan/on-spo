@@ -122,7 +122,7 @@ const Content = () => {
 
   // Render content when access token is ready
   return (
-    <div className="container mx-auto text-neutral-800 mt-8">
+    <div className="container mx-auto text-neutral-800 mt-8 mb-40">
       {profile ? ( 
         <>
           <h1 className="text-4xl font-semibold">

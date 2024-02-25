@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 const API_BASE_URL = 'https://api.spotify.com/v1';
-const ENDPOINT = '/me/top/tracks?time_range=long_term&limit=5';
+const ENDPOINT = '/me/top/tracks?time_range=long_term&limit=25';
 
 const GetTopTracks = () => {
+  const [active, setActive] = useState(false);
   const [token, setToken] = useState("");
   const [data, setData] = useState({});
 
@@ -17,6 +18,7 @@ const GetTopTracks = () => {
 
   const handleGetTopTracks = async () => {
     try {
+      setActive(!active);
       const response = await axios.get(API_BASE_URL + ENDPOINT, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -31,8 +33,13 @@ const GetTopTracks = () => {
 
   return (
     <>
-      <button onClick={handleGetTopTracks} className="border-b-2 border-blue-500 my-4">Get Top 5 Tracks</button>
-      {data?.items ? 
+      <button 
+        onClick={handleGetTopTracks} 
+        className={`border-b-2 border-neutral-800 my-4 px-4 py-1 ${active ? 'border-2 border-blue-500' : ''}`}>
+          Get Top 5 Tracks
+      </button>
+      {active ? 
+        data?.items ? 
           <table className="text-neutral-800">
             <thead>
               <tr className="bg-neutral-100">
@@ -58,8 +65,11 @@ const GetTopTracks = () => {
               )}
             </tbody>
           </table> 
-        : 
-        null}
+        :   
+        null 
+      :
+        null
+        }
     </>
   );
 };
