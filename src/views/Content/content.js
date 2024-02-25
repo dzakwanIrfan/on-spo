@@ -40,6 +40,7 @@ const Content = () => {
   let searchParams = new URLSearchParams(window.location.search);
   let state = searchParams.get("state") || null;
   let code = searchParams.get("code") || null;
+  const [profile, setProfile] = useState('');
 
   useEffect(() => {
     const fetchAccessToken = async () => {
@@ -63,15 +64,33 @@ const Content = () => {
             }
           );
 
-          localStorage.clear();
-          localStorage.setItem("access_token", response.data.access_token);
-          localStorage.setItem("token_type", response.data.token_type);
-          localStorage.setItem("scope", response.data.scope);
-          localStorage.setItem("expires_in", response.data.expires_in);
-          localStorage.setItem("refresh_token", response.data.refresh_token);
+        const fetchProfile = async () => {
+            try {
+                if(response.data.access_token){
+                    const result = await axios.get('https://api.spotify.com/v1/me', {
+                        headers: {
+                            Authorization: `Bearer ${response.data.access_token}`
+                        }
+                    });
+                    console.log(result.data);
+                    setProfile(result.data);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
 
-          // Set the flag to indicate that access token is ready
-          setAccessTokenReady(true);
+        
+        localStorage.clear();
+        localStorage.setItem("access_token", response.data.access_token);
+        localStorage.setItem("token_type", response.data.token_type);
+        localStorage.setItem("scope", response.data.scope);
+        localStorage.setItem("expires_in", response.data.expires_in);
+        localStorage.setItem("refresh_token", response.data.refresh_token);
+        setTimeout(() => {
+            fetchProfile();
+        }, 1000)
+        setAccessTokenReady(true);
         }
       } catch (error) {
         console.log(error);
@@ -104,10 +123,31 @@ const Content = () => {
   // Render content when access token is ready
   return (
     <div className="container mx-auto text-neutral-800 mt-8">
-      <h1 className="text-4xl font-semibold">Fitur mirip kaya Receiptify</h1>
-      <GetTopTracks />
-      <br />
-      <button onClick={handleLogout} className="bg-blue-500 rounded px-2 text-neutral-50">Logout</button>
+      {profile ? ( 
+        <>
+          <h1 className="text-4xl font-semibold">
+            Halo{" "}
+            <a
+              href={profile.external_urls.spotify}
+              className="hover:text-blue-500 underline"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {profile.display_name}
+            </a>
+          </h1>
+          <GetTopTracks />
+          <br />
+          <button
+            onClick={handleLogout}
+            className="bg-blue-500 rounded px-2 text-neutral-50"
+          >
+            Logout
+          </button>
+        </>
+      ) : (
+        <p>Loading profile...</p>
+      )}
     </div>
   );
 };

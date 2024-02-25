@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
 
 const API_BASE_URL = 'https://api.spotify.com/v1';
 const ENDPOINT = '/me/top/tracks?time_range=long_term&limit=5';
